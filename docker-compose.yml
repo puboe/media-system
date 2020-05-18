@@ -24,14 +24,9 @@ services:
             driver: json-file
             options:
                 max-size: 10m
-        environment:
-            - CREATE_TUN_DEVICE=true
-            - OPENVPN_PROVIDER=CUSTOM
-            - OPENVPN_USERNAME=your_openvpn_username
-            - OPENVPN_PASSWORD=your_openvpn_password
-            - OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60
-            - WEBPROXY_ENABLED=false
-            - LOCAL_NETWORK=192.168.0.0/24
+        env_file: 
+            - ./transmission/config/DockerEnv
+
    
                 
                 
