@@ -8,14 +8,14 @@ services:
             context: ./flexget
             dockerfile: Dockerfile
         volumes: 
-            - ./path/to/config:/app
+            - ./flexget/config:/app
             
     transmission:
         restart: unless-stopped
         image: haugene/transmission-openvpn:latest
         volumes: 
-            - ./path/to/data:/data
-            - ./path/to/config/default.ovpn:/etc/openvpn/custom/default.ovpn
+            - ${ROOT_DIR}/media:/data
+            - ./transmission/config/default.ovpn:/etc/openvpn/custom/default.ovpn  # place your vpn config here
         ports:
             - 9091:9091
         cap_add:
@@ -24,24 +24,26 @@ services:
             driver: json-file
             options:
                 max-size: 10m
+        environment:
+          - PUID=${PUID}
+          - PGID=${PGID}
         env_file: 
-            - ./transmission/config/DockerEnv
+          - ./transmission/config/DockerEnv
     
     plex:
         container_name: plex
         restart: unless-stopped
-        image: plexinc/pms-docker
+        image: lscr.io/linuxserver/plex
         network_mode: host
         environment:
-          - TZ=Europe/Madrid
-          - PLEX_CLAIM={your_plex_claim}
-          - ADVERTISE_IP=http://{host_ip}:32400/
-        hostname: plex-server
+          - PUID=${PUID}
+          - PGID=${PGID}
+          - TZ=${TIMEZONE}
+          - PLEX_CLAIM=${PLEX_CLAIM}
+          - ADVERTISE_IP=http://${PLEX_HOST_IP}:32400/
+          - VERSION=docker
+        hostname: ${PLEX_SERVER_NAME}
         volumes:
-          - /path/to/plex/database:/config
-          - /path/to/transcode/temp:/transcode
-          - /path/to/media:/data       
-
-   
-                
-                
+          - ${ROOT_DIR}/plex/config:/config
+          - ${ROOT_DIR}/plex/tmp:/transcode
+          - ${ROOT_DIR}/media:/data
